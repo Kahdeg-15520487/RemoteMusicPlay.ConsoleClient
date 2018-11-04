@@ -1,6 +1,7 @@
 ﻿using RemoteMusicPlayClient.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -312,6 +313,16 @@ namespace RemoteMusicPlayClient
             }
         }
 
+        public static APIResult<Music> GetFile(Uri uri, string id)
+        {
+            using (var client = new APIClient(uri))
+            {
+                var result = client.GetObjectAsync<Music>($"api/music", id).Result;
+
+                return result;
+            }
+        }
+
         public static APIResult<bool> Show(Uri uri, string show)
         {
             using (var client = new APIClient(uri))
@@ -320,6 +331,24 @@ namespace RemoteMusicPlayClient
 
                 return result;
             }
+        }
+
+        public static string RunCmd(string command)
+        {
+            Process prc = new Process();
+
+            prc.StartInfo.FileName = "cmd.exe";
+            prc.StartInfo.RedirectStandardInput = true;
+            prc.StartInfo.RedirectStandardOutput = true;
+            prc.StartInfo.CreateNoWindow = true;
+            prc.StartInfo.UseShellExecute = false;
+
+            prc.Start();
+
+            prc.StandardInput.WriteLine(command);
+            prc.StandardInput.Flush();
+            prc.StandardInput.Close();
+            return prc.StandardOutput.ReadToEnd();
         }
     }
 }

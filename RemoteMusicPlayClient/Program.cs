@@ -147,6 +147,22 @@ namespace RemoteMusicPlayClient
                 }
             }
 
+            class RunCmd : ICommand
+            {
+                public IModule Module { get; set; }
+
+                public string Name => "cmd";
+
+                public int ArgumentCount => 1;
+
+                public Result Do(params string[] args)
+                {
+                    var cmd = args[0];
+                    var result = Helper.RunCmd(cmd);
+                    return Result.Success(result);
+                }
+            }
+
             class LoadModule : ICommand
             {
                 public IModule Module { get; set; }
@@ -235,15 +251,12 @@ namespace RemoteMusicPlayClient
                 public Result Do(params string[] args)
                 {
                     var id = args[0];
+                    var result = Helper.GetFile(new Uri(BaseAddress), id);
+                    Console.WriteLine($"now playing {result.Result.Name}");
 
-                    var result = Helper.PlayFile(new Uri(BaseAddress), id);
+                    result = Helper.PlayFile(new Uri(BaseAddress), id);
 
-                    if (result.StatusCode.IsSuccessStatusCode())
-                    {
-                        return Result.Success($"now playing {result.Result.Name}");
-                    }
-
-                    return Result.Error(result.StatusCode);
+                    return Result.Success();
                 }
             }
 
